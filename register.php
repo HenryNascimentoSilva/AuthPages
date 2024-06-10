@@ -72,6 +72,8 @@ if (isset($_POST['register'])) {
     } catch (mysqli_sql_exception) {
       echo "Username or email already taken";
     }
+  } else {
+    echo "Password doesn't match!";
   }
 }
 mysqli_close($conn);

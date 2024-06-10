@@ -63,25 +63,23 @@ $conn = mysqli_connect("localhost", "root", "", "usersdb");
 if (isset($_POST['login'])) {
   $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
   $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
-  $hash = password_hash($password, PASSWORD_DEFAULT);
-
 
   $sql = "SELECT password FROM users WHERE username = '$username'";
 
   $result = mysqli_query($conn, $sql);
-
-  if ($result) {
-    $row = mysqli_fetch_assoc($result);
+  $row = mysqli_fetch_assoc($result);
+  
+  if ($row != null || $row != false) {
     $dbpass = $row['password'];
-
     $hashtest = password_verify($password, $dbpass);
-
     if($hashtest){
       echo "Logado com sucesso";
-    }
-    else {
+    } else {
       echo "Acesso negado!";
     }
+  }
+  else {
+    echo "User doesn't exists!";
   }
 }
 
