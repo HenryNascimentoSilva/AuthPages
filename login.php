@@ -60,25 +60,27 @@
 <?php 
 $conn = mysqli_connect("localhost", "root", "", "usersdb");
 
-if (isset($_POST['login'])) {
-  $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_SPECIAL_CHARS);
-  $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_SPECIAL_CHARS);
+if (isset($_POST['username']) && isset($_POST['password'])){
+  $username = $conn->real_escape_string($_POST['username']);
+  $password = $conn->real_escape_string($_POST['password']);
 
-  $sql = "SELECT password FROM users WHERE username = '$username'";
-
-  $result = mysqli_query($conn, $sql);
-  $row = mysqli_fetch_assoc($result);
+  $sql = "SELECT * FROM users WHERE username = '$username'";
+  $query = $conn->query($sql) or die($conn->error);
+  $quantity = $query->num_rows;
   
-  if ($row != null || $row != false) {
+  if ($quantity == 1){
+    $row = $query->fetch_assoc();
     $dbpass = $row['password'];
-    $hashtest = password_verify($password, $dbpass);
-    if($hashtest){
-      echo "Logado com sucesso";
+    $hash = password_verify($password, $dbpass);
+    if ($hash){
+      if(!isset($_SESSION)){
+        session_start();
+      }
+      $_SESSION['user'] = $row['id'];
     } else {
       echo "Acesso negado!";
     }
-  }
-  else {
+  } else {
     echo "User doesn't exists!";
   }
 }
